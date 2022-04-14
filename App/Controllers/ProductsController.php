@@ -7,7 +7,7 @@ class ProductsController
 {
     
     /**
-     * retorna los una data en formato json, incluyendo un arreglo de productos
+     * retorna los una data en formato json, incluyendo un arreglo de productos.
      * 
      * @return string
      */
@@ -27,7 +27,7 @@ class ProductsController
     }
 
     /**
-     * llama a el metodo find de la clase ProductDAO para obtener un producto
+     * llama a el metodo find de la clase Product para obtener un producto
      * asociado a un id recibido como parametro.
      * 
      * @param $id
@@ -47,7 +47,7 @@ class ProductsController
     }
 
     /**
-     * Llama a el metodo create de la clase ProductDAO para crear un nuevo producto.
+     * Llama a el metodo create de la clase Product para crear un nuevo producto.
      * 
      * @param $product_name
      * @param $description
@@ -72,7 +72,8 @@ class ProductsController
     }
 
     /**
-     * Llama a el metodo update de la clase ProductDAO para actualizar un producto.
+     * Llama a el metodo find de la clase Product para obtener un producto
+     * si existe llama a el metodo update de la clase Product para actualizar.
      * 
      * @param $id
      * @param $product_name
@@ -85,11 +86,13 @@ class ProductsController
      */
     public static function edit($id, $product_name, $description, $price, $image, $category)
     {
-        $result = Product::update($id, $product_name, $description, $price, $image, $category);
+        $result = Product::find($id);
 
         if ($result == false) {
-            $response = new Response(404, false, 'No se pudo actualizar el producto.', null);
+            $response = new Response(404, false, 'No se encontró el producto en nuestros registros.', null);
         } else {
+            $result = Product::update($id, $product_name, $description, $price, $image, $category);
+
             $response = new Response(200, true, 'Producto actualizado.', $result);
         }
 
@@ -97,8 +100,8 @@ class ProductsController
     }
 
     /**
-     * Llama a el metodo delete de la clase ProductDAO para eliminar un producto
-     * asociado a el id recibido como parametro.
+     * Llama a el metodo find de la clase Product para obtener un producto
+     * si existe llama a el metodo delete de la clase Product para eliminar.
      * 
      * @param $id
      * 
@@ -106,9 +109,15 @@ class ProductsController
      */
     public static function destroy($id) 
     {
-        $result = Product::delete($id);
+        $data = Product::find($id);
+        
+        if($data != false) {
+            $result   = Product::delete($id);
+            $response = new Response(200, true, 'Producto eliminado.', $result);
 
-        $response = new Response(200, true, 'Producto eliminado.', $result);
+        } else {
+            $response = new Response(404, false, 'El producto no se encuentra registrado.', null);
+        }
         
         return $response->toJson();
     }
