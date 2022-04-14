@@ -162,9 +162,7 @@ class Product implements IProduct
             
             $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($product === false) return null;
-
-            return true;
+            return $product;
         }
         catch (PDOException $e) {
 
